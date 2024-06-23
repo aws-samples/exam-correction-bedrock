@@ -1,2 +1,3 @@
-# exam-correction
-Writing and MQA correction
+# Exam Correction
+
+Writing and Multiple Answer Questions (MAQ) correction
