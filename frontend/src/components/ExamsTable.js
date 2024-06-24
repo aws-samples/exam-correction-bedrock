@@ -15,6 +15,7 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import ImageIcon from "@mui/icons-material/Image";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import ExamReport from "./ExamReport";
+import api from "../services/api";
 
 const columns = [
   //{ id: "student", label: "Aluno", minWidth: 100 },
@@ -34,9 +35,21 @@ function ExamsTable({ exams, onRefresh }) {
     observations: "",
   });
 
-  const handleOpenReport = (exam) => {
+  const handleOpenImage = async (filename) => {
+    try {
+      const response = await api.get(`/download/${filename}`);
+      const presignedUrl = response.data.presigned_url;
+      return presignedUrl;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  };
+
+  const handleOpenReport = async (exam) => {
+    const imageUrl = await handleOpenImage(exam.image);
     setCorrection({
-      image: exam.image,
+      image: imageUrl,
       correction: exam.correction,
       observations: "",
     });
@@ -81,7 +94,17 @@ function ExamsTable({ exams, onRefresh }) {
                     return (
                       <TableCell key={column.id} align={column.align}>
                         {value !== "" ? (
-                          <Button href={row.image} target="_blank">
+                          <Button
+                            onClick={async () => {
+                              try {
+                                const url = await handleOpenImage(row.image);
+                                window.open(url, "_blank");
+                              } catch (error) {
+                                console.error("Error opening image:", error);
+                                // Handle error (e.g., show a message to the user)
+                              }
+                            }}
+                          >
                             <ImageIcon />
                           </Button>
                         ) : (

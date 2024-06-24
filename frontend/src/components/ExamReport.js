@@ -26,7 +26,7 @@ function ExamReport({ correction, openReport, closeReport }) {
           <Grid item xs={12} md={6}>
             <img
               src={correction.image}
-              alt="Correction Image"
+              alt="Correction report"
               style={{ maxWidth: "100%", height: "auto" }}
             />{" "}
           </Grid>

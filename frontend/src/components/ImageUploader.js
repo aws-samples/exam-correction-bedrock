@@ -1,12 +1,15 @@
 import { Fragment, useState } from "react";
-import { Button, Box, CircularProgress } from "@mui/material";
+import { Button, Box, CircularProgress, Snackbar } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import DeleteIcon from "@mui/icons-material/Delete";
+import api from "../services/api";
 
 const ImageUploader = () => {
   const [loading, setLoading] = useState(false);
   const [file, setFile] = useState(null);
   const [image, setImage] = useState(null);
+  const [message, setMessage] = useState(null);
+  const [openSnack, setOpenSnack] = useState(false);
 
   const handleImageSelect = (event) => {
     setFile(event.target.files[0]);
@@ -15,12 +18,47 @@ const ImageUploader = () => {
 
   const handleImageUpload = (event) => {
     setLoading(true);
-    console.log(file);
-    setTimeout(() => {
-      setFile(null);
-      setImage(null);
-      setLoading(false);
-    }, 5000);
+    console.log(file.name);
+    api
+      .post("/upload", {
+        file_name: file.name,
+      })
+      .then((response) => {
+        const presignedUrl = response.data.presigned_url;
+        // Perform the upload to S3 using the fetched presignedUrl
+        fetch(presignedUrl, {
+          method: "PUT",
+          headers: {
+            "Content-Type": file.type, // Set the correct content type for the file
+          },
+          body: file,
+        })
+          .then((uploadResponse) => {
+            setFile(null);
+            setImage(null);
+            setLoading(false);
+            setMessage(
+              "Carregamento feito com sucesso! Aguarde o processamento."
+            );
+            setOpenSnack(true);
+          })
+          .catch((uploadError) => {
+            console.error(uploadError);
+            setFile(null);
+            setImage(null);
+            setLoading(false);
+            setMessage("Não foi possível carregar o arquivo!");
+            setOpenSnack(true);
+          });
+      })
+      .catch((error) => {
+        console.error(error);
+        setFile(null);
+        setImage(null);
+        setLoading(false);
+        setMessage("Não foi possível obter a URL de upload.");
+        setOpenSnack(true);
+      });
   };
 
   const handleRemoveImage = () => {
@@ -93,6 +131,14 @@ const ImageUploader = () => {
         </Fragment>
       )}
       {loading && <CircularProgress />}
+      {message && (
+        <Snackbar
+          open={openSnack}
+          autoHideDuration={6000}
+          onClose={() => setOpenSnack(false)}
+          message={message}
+        />
+      )}
     </Box>
   );
 };

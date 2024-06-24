@@ -3,6 +3,7 @@ import { Typography, Box, Container, Modal, Link } from "@mui/material";
 import ExamsTable from "../components/ExamsTable";
 import ImageUploader from "../components/ImageUploader";
 import api from "../services/api";
+import video from "../assets/scanner.mp4";
 
 const modalStyle = {
   position: "absolute",
@@ -94,6 +95,9 @@ function Exams() {
             no seu computador. O código irá identificar novas imagens na pasta
             de escolha e irá enviar para a conta AWS.
           </Typography>
+          <video width="100%" controls>
+            <source src={video} type="video/mp4" />
+          </video>
           <Typography id="modal-modal-title" variant="h5" sx={{ mt: 2 }}>
             Amazon Alexa
           </Typography>
