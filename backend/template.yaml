@@ -6,6 +6,11 @@ Globals:
   Function:
     Timeout: 3
     MemorySize: 128
+  Api:
+    Cors:
+      AllowMethods: "'*'"
+      AllowHeaders: "'*'"
+      AllowOrigin: "'*'"
 
 Resources:
   ExamsBucket:
@@ -104,6 +109,52 @@ Resources:
           Type: Api
           Properties:
             Path: /exams
+            Method: get
+
+  UploadExamFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/upload_exam/
+      Handler: app.lambda_handler
+      Runtime: python3.10
+      Architectures:
+        - x86_64
+      Timeout: 5
+      Policies:
+        - AWSLambdaExecute
+        - S3CrudPolicy:
+            BucketName: !Sub "${AWS::AccountId}-${AWS::Region}-${AWS::StackName}-exams"
+      Environment:
+        Variables:
+          BUCKET_NAME: !Sub "${AWS::AccountId}-${AWS::Region}-${AWS::StackName}-exams"
+      Events:
+        UploadExam:
+          Type: Api
+          Properties:
+            Path: /upload
+            Method: post
+
+  DownloadExamFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/download_exam/
+      Handler: app.lambda_handler
+      Runtime: python3.10
+      Architectures:
+        - x86_64
+      Timeout: 5
+      Policies:
+        - AWSLambdaExecute
+        - S3CrudPolicy:
+            BucketName: !Sub "${AWS::AccountId}-${AWS::Region}-${AWS::StackName}-exams"
+      Environment:
+        Variables:
+          BUCKET_NAME: !Sub "${AWS::AccountId}-${AWS::Region}-${AWS::StackName}-exams"
+      Events:
+        UploadExam:
+          Type: Api
+          Properties:
+            Path: /download/{filename}
             Method: get
 
 Outputs:

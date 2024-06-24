@@ -1,3 +1,4 @@
+from urllib.parse import unquote_plus
 import os
 import json
 import base64
@@ -20,6 +21,8 @@ def correct_exam():
 def lambda_handler(event, context):
     # Get exam image
     examKey = event['Records'][0]['s3']['object']['key']
+    examKey = unquote_plus(examKey)
+
     exam = s3.get_object(
         Bucket= BUCKET, 
         Key= examKey
@@ -74,8 +77,7 @@ def lambda_handler(event, context):
             "date": date,
             "hour": hour,
             "student": "Gabriel",
-            "image":
-                "https://www.institutoclaro.org.br/educacao/wp-content/uploads/sites/2/2022/11/redacaoEnem1000-2.png",
+            "image": examKey,
             "grade": "Nota",
             "correction": correction
         }

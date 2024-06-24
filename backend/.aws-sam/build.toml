@@ -19,4 +19,22 @@ manifest_hash = "d41d8cd98f00b204e9800998ecf8427e"
 packagetype = "Zip"
 functions = ["GetExamsFunction"]
 
+[function_build_definitions.9f7af529-ec9a-486c-8816-733de286abdc]
+codeuri = "/Users/martinig/Demos/exam-correction/backend/src/upload_exam"
+runtime = "python3.10"
+architecture = "x86_64"
+handler = "app.lambda_handler"
+manifest_hash = "d41d8cd98f00b204e9800998ecf8427e"
+packagetype = "Zip"
+functions = ["UploadExamFunction"]
+
+[function_build_definitions.ac36544b-6b03-445a-9f92-2011ac527272]
+codeuri = "/Users/martinig/Demos/exam-correction/backend/src/download_exam"
+runtime = "python3.10"
+architecture = "x86_64"
+handler = "app.lambda_handler"
+manifest_hash = "d41d8cd98f00b204e9800998ecf8427e"
+packagetype = "Zip"
+functions = ["DownloadExamFunction"]
+
 [layer_build_definitions]
