@@ -12,8 +12,15 @@ const ImageUploader = () => {
   const [openSnack, setOpenSnack] = useState(false);
 
   const handleImageSelect = (event) => {
-    setFile(event.target.files[0]);
-    setImage(URL.createObjectURL(event.target.files[0]));
+    let file = event.target.files[0];
+    if (file.size >= 1000000) {
+      setMessage("O arquivo excede o limite de 10MB.");
+      setOpenSnack(true);
+      return;
+    } else {
+      setFile(file);
+      setImage(URL.createObjectURL(event.target.files[0]));
+    }
   };
 
   const handleImageUpload = (event) => {
