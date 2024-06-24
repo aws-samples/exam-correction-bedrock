@@ -1,59 +1,99 @@
-import { useState } from "react";
-import { Button, IconButton } from "@mui/material";
-import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
+import { Fragment, useState } from "react";
+import { Button, Box, CircularProgress } from "@mui/material";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const ImageUploader = () => {
+  const [loading, setLoading] = useState(false);
+  const [file, setFile] = useState(null);
   const [image, setImage] = useState(null);
 
-  const handleImageUpload = (event) => {
-    const file = event.target.files[0];
-    setImage(URL.createObjectURL(file));
+  const handleImageSelect = (event) => {
+    setFile(event.target.files[0]);
+    setImage(URL.createObjectURL(event.target.files[0]));
   };
 
-  const handleTakePicture = () => {
-    const handleStream = (stream) => {
-      const video = document.createElement("video");
-      video.srcObject = stream;
-      video.play();
+  const handleImageUpload = (event) => {
+    setLoading(true);
+    console.log(file);
+    setTimeout(() => {
+      setFile(null);
+      setImage(null);
+      setLoading(false);
+    }, 5000);
+  };
 
-      const canvas = document.createElement("canvas");
-      const context = canvas.getContext("2d");
-
-      const takePhoto = () => {
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        context.drawImage(video, 0, 0);
-        const imageURL = canvas.toDataURL("image/jpeg");
-        setImage(imageURL);
-        stream.getTracks().forEach((track) => track.stop());
-      };
-
-      video.addEventListener("loadedmetadata", () => {
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        context.drawImage(video, 0, 0);
-        takePhoto();
-      });
-    };
-
-    navigator.mediaDevices
-      .getUserMedia({ video: true })
-      .then(handleStream)
-      .catch((error) => console.error("Error accessing camera:", error));
+  const handleRemoveImage = () => {
+    setFile(null);
+    setImage(null);
   };
 
   return (
-    <div>
-      <label htmlFor="image-upload">
-        <IconButton color="primary" component="span">
-          <PhotoCameraIcon />
-        </IconButton>
-      </label>
-      <Button variant="contained" color="primary" onClick={handleTakePicture}>
-        Take Picture
-      </Button>
-      {image && <img src={image} alt="Uploaded or Captured" />}
-    </div>
+    <Box>
+      {!file && (
+        <Fragment>
+          <input
+            accept="image/jpeg, image/png"
+            id="image-select"
+            style={{ display: "none" }}
+            type="file"
+            onChange={handleImageSelect}
+          />
+          <label htmlFor="image-select">
+            <Button
+              variant="contained"
+              component="span"
+              startIcon={<CloudUploadIcon />}
+              disabled={!!image}
+            >
+              Selecionar Imagem
+            </Button>
+          </label>
+        </Fragment>
+      )}
+      {file && (
+        <Fragment>
+          <label htmlFor="image-upload">
+            <Button
+              variant="contained"
+              component="span"
+              startIcon={<CloudUploadIcon />}
+              onClick={handleImageUpload}
+              disabled={loading}
+            >
+              Carregar Imagem
+            </Button>
+          </label>
+          <Button
+            variant="contained"
+            color="secondary"
+            startIcon={<DeleteIcon />}
+            onClick={handleRemoveImage}
+            sx={{ ml: 2 }}
+            disabled={loading}
+          >
+            Remover Imagem
+          </Button>
+          <Box
+            display="flex"
+            justifyContent="left"
+            alignItems="center"
+            sx={{ m: 2 }}
+          >
+            <img
+              src={image}
+              alt="Uploaded"
+              style={{
+                maxHeight: "250px",
+                maxWidth: "100%",
+                marginRight: "10px",
+              }}
+            />
+          </Box>
+        </Fragment>
+      )}
+      {loading && <CircularProgress />}
+    </Box>
   );
 };
 
