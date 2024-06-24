@@ -1,6 +1,6 @@
 #!/bin/bash
 FOLDER=Desktop/provas
-BUCKET=martinig-exams
+BUCKET=163701031472-us-east-1-exam-correction-exams
 
 # Every 5 seconds
 while true; do
@@ -13,7 +13,7 @@ while true; do
     echo ===Exams===
     ls ~/$FOLDER
     echo ===Syncing with S3===
-    aws s3 sync ~/$FOLDER s3://$BUCKET
+    aws s3 sync ~/$FOLDER s3://$BUCKET --exclude ".*" --exclude "*/.*"
     # sleep for 5 seconds
     sleep 5
 done
