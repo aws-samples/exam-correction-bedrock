@@ -9,6 +9,7 @@ import {
   Button,
   Box,
   Typography,
+  TableSortLabel,
 } from "@mui/material";
 import { useState } from "react";
 import RefreshIcon from "@mui/icons-material/Refresh";
@@ -34,6 +35,10 @@ function ExamsTable({ exams, onRefresh }) {
     correction: "",
     observations: "",
   });
+  const [sortConfig, setSortConfig] = useState({
+    key: "date",
+    direction: "asc",
+  });
 
   const handleOpenImage = async (filename) => {
     try {
@@ -58,6 +63,21 @@ function ExamsTable({ exams, onRefresh }) {
 
   const handleCloseReport = () => setReportModal(false);
 
+  const handleSort = (columnId) => {
+    const isAsc = sortConfig.key === columnId && sortConfig.direction === "asc";
+    setSortConfig({ key: columnId, direction: isAsc ? "desc" : "asc" });
+  };
+
+  const sortedExams = [...exams].sort((a, b) => {
+    if (a[sortConfig.key] < b[sortConfig.key]) {
+      return sortConfig.direction === "asc" ? -1 : 1;
+    }
+    if (a[sortConfig.key] > b[sortConfig.key]) {
+      return sortConfig.direction === "asc" ? 1 : -1;
+    }
+    return 0;
+  });
+
   return (
     <Paper sx={{ width: "100%", overflow: "hidden" }}>
       <Box
@@ -66,8 +86,8 @@ function ExamsTable({ exams, onRefresh }) {
           flexDirection: "row-reverse",
         }}
       >
-        <Button>
-          <RefreshIcon onClick={onRefresh} />
+        <Button onClick={onRefresh}>
+          <RefreshIcon />
         </Button>
       </Box>
       <TableContainer sx={{ maxHeight: 440 }}>
@@ -80,13 +100,23 @@ function ExamsTable({ exams, onRefresh }) {
                   align={column.align}
                   style={{ minWidth: column.minWidth }}
                 >
-                  {column.label}
+                  <TableSortLabel
+                    active={sortConfig.key === column.id}
+                    direction={
+                      sortConfig.key === column.id
+                        ? sortConfig.direction
+                        : "asc"
+                    }
+                    onClick={() => handleSort(column.id)}
+                  >
+                    {column.label}
+                  </TableSortLabel>
                 </TableCell>
               ))}
             </TableRow>
           </TableHead>
           <TableBody>
-            {exams.map((row) => (
+            {sortedExams.map((row) => (
               <TableRow key={row.id}>
                 {columns.map((column) => {
                   const value = row[column.id];
