@@ -76,11 +76,29 @@ function Exams() {
           <Typography id="modal-modal-title" variant="h5" sx={{ mt: 2 }}>
             Upload das imagens
           </Typography>
+          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+            Tire uma foto da prova enquadrando a prova no centro da imagem. Após
+            isso utilize o botão de <strong>Selecionar Imagem</strong> e{" "}
+            <strong>Carregamento da imagem</strong>. A prova será analisada e
+            irá aparecer na tabela.
+          </Typography>
           <Typography id="modal-modal-title" variant="h5" sx={{ mt: 2 }}>
             Scanner
           </Typography>
+          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+            Caso queira utilizar um scanner por conta do volume de provas,
+            utilize{" "}
+            <a href="https://github.com/gabrielmartinigit/exam-correction/blob/main/scanner/sync.sh">
+              este código
+            </a>{" "}
+            no seu computador. O código irá identificar novas imagens na pasta
+            de escolha e irá enviar para a conta AWS.
+          </Typography>
           <Typography id="modal-modal-title" variant="h5" sx={{ mt: 2 }}>
             Amazon Alexa
+          </Typography>
+          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+            TBC
           </Typography>
           <Typography id="modal-modal-title" variant="h5" sx={{ mt: 2 }}>
             Prompt utilizado
@@ -111,10 +129,13 @@ function Exams() {
             Guardrails utilizados
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            Ataque de prompt
+            TBC
           </Typography>
           <Typography id="modal-modal-title" variant="h4" sx={{ mt: 2 }}>
             Arquitetura AWS
+          </Typography>
+          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+            TBC
           </Typography>
         </Box>
       </Modal>
