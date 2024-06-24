@@ -8,28 +8,108 @@ Globals:
     MemorySize: 128
 
 Resources:
-  HelloWorldFunction:
+  ExamsBucket:
+    Type: "AWS::S3::Bucket"
+    DeletionPolicy: Delete
+    Properties:
+      BucketName: !Sub "${AWS::AccountId}-${AWS::Region}-${AWS::StackName}-exams"
+      AccelerateConfiguration:
+        AccelerationStatus: Enabled
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders:
+              - "*"
+            AllowedMethods:
+              - GET
+              - PUT
+              - POST
+            AllowedOrigins:
+              - "*"
+            Id: CORSRule
+            MaxAge: 3600
+
+  SettingsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "${AWS::AccountId}-${AWS::Region}-${AWS::StackName}-settings"
+      AttributeDefinitions:
+        - AttributeName: name
+          AttributeType: S
+      KeySchema:
+        - AttributeName: name
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+  ExamsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "${AWS::AccountId}-${AWS::Region}-${AWS::StackName}-exams"
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+  AnalyzeFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/api/hello_world/
+      CodeUri: src/analyze_exam/
       Handler: app.lambda_handler
-      Runtime: python3.9
+      Runtime: python3.10
       Architectures:
         - x86_64
+      Timeout: 30
+      Policies:
+        - AWSLambdaExecute
+        - AmazonBedrockFullAccess
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ExamsTable
+        - S3CrudPolicy:
+            BucketName: !Sub "${AWS::AccountId}-${AWS::Region}-${AWS::StackName}-exams"
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref ExamsTable
+          BUCKET_NAME: !Sub "${AWS::AccountId}-${AWS::Region}-${AWS::StackName}-exams"
       Events:
-        HelloWorld:
+        CreatedExam:
+          Type: S3
+          Properties:
+            Bucket: !Ref ExamsBucket
+            Events: s3:ObjectCreated:*
+
+  GetExamsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/get_exams/
+      Handler: app.lambda_handler
+      Runtime: python3.10
+      Architectures:
+        - x86_64
+      Timeout: 5
+      Policies:
+        - AWSLambdaExecute
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ExamsTable
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref ExamsTable
+      Events:
+        ListExams:
           Type: Api
           Properties:
-            Path: /hello
+            Path: /exams
             Method: get
 
 Outputs:
-  HelloWorldApi:
-    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
-  HelloWorldFunction:
-    Description: "Hello World Lambda Function ARN"
-    Value: !GetAtt HelloWorldFunction.Arn
-  HelloWorldFunctionIamRole:
-    Description: "Implicit IAM Role created for Hello World function"
-    Value: !GetAtt HelloWorldFunctionRole.Arn
+  ExamsBucket:
+    Description: S3 bucket name
+    Value: !Ref ExamsBucket
+  ExamsApi:
+    Description: API Gateway endpoint URL
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
