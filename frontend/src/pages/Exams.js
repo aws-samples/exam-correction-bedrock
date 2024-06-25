@@ -10,12 +10,13 @@ const modalStyle = {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: "50%",
+  width: "80%",
   bgcolor: "background.paper",
   boxShadow: 24,
   p: 4,
   maxHeight: "80vh",
   overflow: "auto",
+  border: "none",
 };
 
 function Exams() {
@@ -95,7 +96,7 @@ function Exams() {
             no seu computador. O código irá identificar novas imagens na pasta
             de escolha e irá enviar para a conta AWS.
           </Typography>
-          <video width="100%" controls>
+          <video width="100%" height="720px" controls>
             <source src={video} type="video/mp4" />
           </video>
           <Typography id="modal-modal-title" variant="h5" sx={{ mt: 2 }}>
