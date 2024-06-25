@@ -79,13 +79,8 @@ class AdicionarAnotacaoIntentHandler(AbstractRequestHandler):
             except Exception as err:
                 task_result = "Não consegui executar a tarefa"
                 print(err)
-            
-            prompt = f"""
-                Responda de forma amigável e simples o resultado da tarefa em até no máximo 40 palavras.
-                Caso tenha valores em casas decimais, mude para o padrão brasileiro, utilizando virgula ao inves de ponto.
-                """
 
-            final_answer = self.query_bedrock(prompt + task_result, messages, model_id)
+            final_answer = self.query_bedrock(task_result, messages, model_id)
             
             session_attr["messages"].append(self.format_message("assistant", final_answer))
             
