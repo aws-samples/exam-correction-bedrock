@@ -47,7 +47,7 @@ function ExamReport({ correction, openReport, closeReport }) {
               id="modal-modal-description"
               sx={{ mt: 2, whiteSpace: "pre-line" }}
             >
-              {correction.observations}
+              {correction.comments}
             </Typography>
           </Grid>
         </Grid>

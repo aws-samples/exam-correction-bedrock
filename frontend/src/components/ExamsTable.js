@@ -33,7 +33,7 @@ function ExamsTable({ exams, onRefresh }) {
   const [correction, setCorrection] = useState({
     image: "",
     correction: "",
-    observations: "",
+    comments: "",
   });
   const [sortConfig, setSortConfig] = useState({
     key: "date",
@@ -56,7 +56,7 @@ function ExamsTable({ exams, onRefresh }) {
     setCorrection({
       image: imageUrl,
       correction: exam.correction,
-      observations: "",
+      comments: exam.comments ? exam.comments : "",
     });
     setReportModal(true);
   };
