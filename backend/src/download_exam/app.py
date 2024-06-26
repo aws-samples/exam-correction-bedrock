@@ -1,12 +1,15 @@
 import os
 import json
+import urllib.parse
 import boto3
 
 BUCKET = os.environ["BUCKET_NAME"]
 s3 = boto3.client('s3')
 
 def lambda_handler(event, context):
-    file_name = event['pathParameters']['filename'].replace("%20", " ")
+    encoded_file_name = event['pathParameters']['filename']
+    first_decode = urllib.parse.unquote(encoded_file_name)
+    file_name = urllib.parse.unquote(first_decode)
 
     presigned_url = s3.generate_presigned_url(
         'get_object',
