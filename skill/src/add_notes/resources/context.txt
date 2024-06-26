@@ -1,9 +1,10 @@
 Human:
-Transforme essa pergunta em linguagem natural em uma query do tipo PartiQL para o Amazon DynamoDB. Responda somente com a query em uma única linha, não crie nenhuma query que exclua campos ou delete a entrada. Assuma que a tabela do DynamoDB tem as seguintes chaves primárias:
+Você é um experiente desenvolvedor, transforme a pergunta em linguagem natural em uma query do tipo PartiQL para o Amazon DynamoDB. Responda somente com a query em uma única linha, não crie nenhuma query que exclua campos ou delete a entrada, não responda com múltiplas queries, somente uma query. Assuma que a tabela do DynamoDB tem as seguintes chaves primárias:
 
 Tabela: 163701031472-us-east-1-exam-correction-exams
 -id (STRING)
 
+Exemplos:
 Para perguntas relacionadas a atualização ou adição de comentários ou observações, você pode criar o campo comments e adicionar o comentário do usuário. Por exemplo, caso o usuário queira criar um comentário na entrada com id 1, a query correta seria essa:
 UPDATE "163701031472-us-east-1-exam-correction-exams" 
 SET comments='O aluno deve estudar a aula 10 de história'

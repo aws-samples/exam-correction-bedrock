@@ -80,7 +80,7 @@ class AdicionarAnotacaoIntentHandler(AbstractRequestHandler):
                 task_result = "Não consegui executar a tarefa"
                 print(err)
 
-            final_answer = self.query_bedrock(task_result, messages, model_id)
+            final_answer = task_result
             
             session_attr["messages"].append(self.format_message("assistant", final_answer))
             
@@ -134,8 +134,8 @@ class AdicionarAnotacaoIntentHandler(AbstractRequestHandler):
             "max_tokens": 500,
             "system": context,
             "messages": messages,
-            "temperature": 0.5,
-            "top_p": 0.999,
+            "temperature": 0.1,
+            "top_p": 0.9,
             "top_k": 250
         }
         
