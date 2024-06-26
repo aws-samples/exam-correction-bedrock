@@ -13,7 +13,7 @@ const ImageUploader = () => {
 
   const handleImageSelect = (event) => {
     let file = event.target.files[0];
-    if (file.size >= 1000000) {
+    if (file.size >= 10000000) {
       setMessage("O arquivo excede o limite de 10MB.");
       setOpenSnack(true);
       return;
