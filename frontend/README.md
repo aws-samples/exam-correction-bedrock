@@ -1,5 +1,11 @@
 # Frontend
 
+## Requirements
+
+get ApiGateway URL from Backend and put into src/services/api.js
+
+Request acces to Amazon Bedrock Model Claude 3 Sonnet
+
 ## Run local
 
 ```bash

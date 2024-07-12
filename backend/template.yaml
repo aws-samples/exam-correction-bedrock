@@ -12,6 +12,12 @@ Globals:
       AllowHeaders: "'*'"
       AllowOrigin: "'*'"
 
+Parameters:
+  PythonVersion:
+    Type: String
+    Default: python3.12
+    Description: Python version
+
 Resources:
   ExamsBucket:
     Type: "AWS::S3::Bucket"
@@ -66,7 +72,7 @@ Resources:
     Properties:
       CodeUri: src/analyze_exam/
       Handler: app.lambda_handler
-      Runtime: python3.10
+      Runtime: !Ref PythonVersion
       Architectures:
         - x86_64
       Timeout: 30
@@ -93,7 +99,7 @@ Resources:
     Properties:
       CodeUri: src/get_exams/
       Handler: app.lambda_handler
-      Runtime: python3.10
+      Runtime: !Ref PythonVersion
       Architectures:
         - x86_64
       Timeout: 5
@@ -116,7 +122,7 @@ Resources:
     Properties:
       CodeUri: src/upload_exam/
       Handler: app.lambda_handler
-      Runtime: python3.10
+      Runtime: !Ref PythonVersion
       Architectures:
         - x86_64
       Timeout: 5
@@ -139,7 +145,7 @@ Resources:
     Properties:
       CodeUri: src/download_exam/
       Handler: app.lambda_handler
-      Runtime: python3.10
+      Runtime: !Ref PythonVersion
       Architectures:
         - x86_64
       Timeout: 5
