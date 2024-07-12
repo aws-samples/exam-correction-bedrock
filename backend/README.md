@@ -1,0 +1,23 @@
+# Backend
+
+# Requirements
+
+Python3
+
+# Valid AWS Credentias
+
+use aws configure or export valid AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY
+
+## Build & Deploy
+
+```bash
+sam validate
+sam build
+sam deploy --stack-name exam-correction --resolve-s3 --resolve-image-repos --capabilities CAPABILITY_AUTO_EXPAND CAPABILITY_IAM --no-confirm-changeset --parameter-overrides PythonVersion=`python3 --version | sed 's/ //g' | cut -d '.' -f 1,2 | tr '[:upper:]' '[:lower:]'`
+```
+
+## Delete
+
+```bash
+sam delete --stack-name exam-correction
+```

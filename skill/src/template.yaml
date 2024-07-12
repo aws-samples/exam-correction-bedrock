@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Alexa and Bedrock integration
+
+Parameters:
+  SkillID:
+    Type: String
+    Description: ID da Skill que irá interagir com a função Lambda
+  TableName:
+    Type: String
+    Description: Nome da tabela do Amazon DynamoDB onde estão os dados
+
+Resources:
+  AlexaSkillFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: add_notes/
+      Handler: app.handler
+      Runtime: python3.10
+      Architectures:
+        - x86_64
+      Timeout: 15
+      Policies:
+        - AWSLambdaExecute
+        - AmazonBedrockFullAccess
+        - AmazonDynamoDBFullAccess
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref TableName
+      Events:
+        AlexaTrigger:
+          Type: AlexaSkill
+          SkillId: !Ref SkillID
+
+Outputs:
+  AlexaSkillArn:
+    Value: !GetAtt AlexaSkillFunction.Arn
+    Description: Arn da Função Lambda que deve ser configurada na Skill da Alexa

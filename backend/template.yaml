@@ -1,0 +1,172 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Exam correction
+
+Globals:
+  Function:
+    Timeout: 3
+    MemorySize: 128
+  Api:
+    Cors:
+      AllowMethods: "'*'"
+      AllowHeaders: "'*'"
+      AllowOrigin: "'*'"
+
+Parameters:
+  PythonVersion:
+    Type: String
+    Default: python3.12
+    Description: Python version
+
+Resources:
+  ExamsBucket:
+    Type: "AWS::S3::Bucket"
+    DeletionPolicy: Delete
+    Properties:
+      BucketName: !Sub "${AWS::AccountId}-${AWS::Region}-${AWS::StackName}-exams"
+      AccelerateConfiguration:
+        AccelerationStatus: Enabled
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders:
+              - "*"
+            AllowedMethods:
+              - GET
+              - PUT
+              - POST
+            AllowedOrigins:
+              - "*"
+            Id: CORSRule
+            MaxAge: 3600
+
+  SettingsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "${AWS::AccountId}-${AWS::Region}-${AWS::StackName}-settings"
+      AttributeDefinitions:
+        - AttributeName: name
+          AttributeType: S
+      KeySchema:
+        - AttributeName: name
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+  ExamsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "${AWS::AccountId}-${AWS::Region}-${AWS::StackName}-exams"
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+  AnalyzeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/analyze_exam/
+      Handler: app.lambda_handler
+      Runtime: !Ref PythonVersion
+      Architectures:
+        - x86_64
+      Timeout: 30
+      Policies:
+        - AWSLambdaExecute
+        - AmazonBedrockFullAccess
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ExamsTable
+        - S3CrudPolicy:
+            BucketName: !Sub "${AWS::AccountId}-${AWS::Region}-${AWS::StackName}-exams"
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref ExamsTable
+          BUCKET_NAME: !Sub "${AWS::AccountId}-${AWS::Region}-${AWS::StackName}-exams"
+      Events:
+        CreatedExam:
+          Type: S3
+          Properties:
+            Bucket: !Ref ExamsBucket
+            Events: s3:ObjectCreated:*
+
+  GetExamsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/get_exams/
+      Handler: app.lambda_handler
+      Runtime: !Ref PythonVersion
+      Architectures:
+        - x86_64
+      Timeout: 5
+      Policies:
+        - AWSLambdaExecute
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ExamsTable
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref ExamsTable
+      Events:
+        ListExams:
+          Type: Api
+          Properties:
+            Path: /exams
+            Method: get
+
+  UploadExamFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/upload_exam/
+      Handler: app.lambda_handler
+      Runtime: !Ref PythonVersion
+      Architectures:
+        - x86_64
+      Timeout: 5
+      Policies:
+        - AWSLambdaExecute
+        - S3CrudPolicy:
+            BucketName: !Sub "${AWS::AccountId}-${AWS::Region}-${AWS::StackName}-exams"
+      Environment:
+        Variables:
+          BUCKET_NAME: !Sub "${AWS::AccountId}-${AWS::Region}-${AWS::StackName}-exams"
+      Events:
+        UploadExam:
+          Type: Api
+          Properties:
+            Path: /upload
+            Method: post
+
+  DownloadExamFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/download_exam/
+      Handler: app.lambda_handler
+      Runtime: !Ref PythonVersion
+      Architectures:
+        - x86_64
+      Timeout: 5
+      Policies:
+        - AWSLambdaExecute
+        - S3CrudPolicy:
+            BucketName: !Sub "${AWS::AccountId}-${AWS::Region}-${AWS::StackName}-exams"
+      Environment:
+        Variables:
+          BUCKET_NAME: !Sub "${AWS::AccountId}-${AWS::Region}-${AWS::StackName}-exams"
+      Events:
+        UploadExam:
+          Type: Api
+          Properties:
+            Path: /download/{filename}
+            Method: get
+
+Outputs:
+  ExamsBucket:
+    Description: S3 bucket name
+    Value: !Ref ExamsBucket
+  ExamsApi:
+    Description: API Gateway endpoint URL
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
