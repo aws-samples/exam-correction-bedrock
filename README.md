@@ -1,9 +1,12 @@
-# exam-correction
+# Exam Correction
 
+Writing and Multiple Answer Questions (MAQ) correction
 
+# Requirements
 
-## Getting started
+Node.js v20.14.0, NPM 10.7.0, Python 3.10 or above
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+# Steps
 
 Run Backend environments before Frontend environments
+
