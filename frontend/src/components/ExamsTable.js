@@ -24,7 +24,7 @@ const columns = [
   { id: "date", label: "Data", minWidth: 100 },
   { id: "hour", label: "Hora", minWidth: 100 },
   { id: "id", label: "Identificador", minWidth: 100 },
-  { id: "image", label: "Imagem", minWidth: 100 },
+  { id: "image", label: "Transcrição", minWidth: 100 },
   { id: "correction", label: "Correção", minWidth: 100 },
 ];
 
@@ -56,6 +56,16 @@ function ExamsTable({ exams, onRefresh }) {
     setCorrection({
       image: imageUrl,
       correction: exam.correction,
+      comments: exam.comments ? exam.comments : "",
+    });
+    setReportModal(true);
+  };
+
+  const handleTranscribeReport = async (exam) => {
+    const imageUrl = await handleOpenImage(exam.image);
+    setCorrection({
+      image: imageUrl,
+      correction: exam.transcribe,
       comments: exam.comments ? exam.comments : "",
     });
     setReportModal(true);
@@ -125,22 +135,35 @@ function ExamsTable({ exams, onRefresh }) {
                       <TableCell key={column.id} align={column.align}>
                         {value !== "" ? (
                           <Button
-                            onClick={async () => {
-                              try {
-                                const url = await handleOpenImage(row.image);
-                                window.open(url, "_blank");
-                              } catch (error) {
-                                console.error("Error opening image:", error);
-                                // Handle error (e.g., show a message to the user)
-                              }
+                            onClick={() => {
+                              handleTranscribeReport(row);
                             }}
                           >
-                            <ImageIcon />
+                            <AssessmentIcon />
                           </Button>
                         ) : (
                           <Typography>aguardando</Typography>
                         )}
                       </TableCell>
+                      // <TableCell key={column.id} align={column.align}>
+                      //   {value !== "" ? (
+                      //     <Button
+                      //       onClick={async () => {
+                      //         try {
+                      //           const url = await handleOpenImage(row.image);
+                      //           window.open(url, "_blank");
+                      //         } catch (error) {
+                      //           console.error("Error opening image:", error);
+                      //           // Handle error (e.g., show a message to the user)
+                      //         }
+                      //       }}
+                      //     >
+                      //       <ImageIcon />
+                      //     </Button>
+                      //   ) : (
+                      //     <Typography>aguardando</Typography>
+                      //   )}
+                      // </TableCell>
                     );
                   } else if (column.id === "correction") {
                     return (
