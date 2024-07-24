@@ -37,20 +37,6 @@ Resources:
             Id: CORSRule
             MaxAge: 3600
 
-  SettingsTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      TableName: !Sub "${AWS::AccountId}-${AWS::Region}-${AWS::StackName}-settings"
-      AttributeDefinitions:
-        - AttributeName: name
-          AttributeType: S
-      KeySchema:
-        - AttributeName: name
-          KeyType: HASH
-      ProvisionedThroughput:
-        ReadCapacityUnits: 5
-        WriteCapacityUnits: 5
-
   ExamsTable:
     Type: AWS::DynamoDB::Table
     Properties:
