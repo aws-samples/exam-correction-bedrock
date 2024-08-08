@@ -4,6 +4,13 @@ set -e
 
 echo "Install project"
 
+read -p "Enter aws Region (us-east-1): " DEPLOY_REGION
+
+if [ -z "$DEPLOY_REGION" ]
+then
+    DEPLOY_REGION="us-east-1"
+fi
+
 # Run Backend
 echo "Backend"
 
@@ -11,7 +18,7 @@ cd backend
 
 sam validate
 sam build
-sam deploy --stack-name exam-correction --resolve-s3 --resolve-image-repos --capabilities CAPABILITY_AUTO_EXPAND CAPABILITY_IAM --no-confirm-changeset --parameter-overrides PythonVersion=`python3 --version | sed 's/ //g' | cut -d '.' -f 1,2 | tr '[:upper:]' '[:lower:]'`
+sam deploy --region $DEPLOY_REGION --stack-name exam-correction --resolve-s3 --resolve-image-repos --capabilities CAPABILITY_AUTO_EXPAND CAPABILITY_IAM --no-confirm-changeset --parameter-overrides PythonVersion=`python3 --version | sed 's/ //g' | cut -d '.' -f 1,2 | tr '[:upper:]' '[:lower:]'`
 
 echo "Frontend"
 

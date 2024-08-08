@@ -1,6 +1,6 @@
 #!/bin/bash
 FOLDER=Desktop/provas
-BUCKET=163701031472-us-east-1-exam-correction-exams
+BUCKET=$(aws cloudformation describe-stacks --stack-name exam-correction --query 'Stacks[0].Outputs[?OutputKey==`ExamsBucket`].OutputValue' --output text)
 
 # Every 5 seconds
 while true; do
