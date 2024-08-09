@@ -5,7 +5,7 @@ import base64
 import random
 import datetime
 import boto3
-import time
+from botocore.config import Config
 
 TABLE = os.environ["TABLE_NAME"]
 BUCKET = os.environ["BUCKET_NAME"]
@@ -15,33 +15,19 @@ PROMPT = "Corrigir a seguinte redação de acordo com os critérios de avaliaç�
 PROMPTtranscribe = "Transcribe this text. Only output the text and nothing else."
 
 s3 = boto3.client('s3')
-bedrock_client = boto3.client("bedrock-runtime")
+
 dynamodb = boto3.resource("dynamodb")
+
+configRetry = Config(
+   retries = {
+      'max_attempts': 10,
+      'mode': 'standard'
+   }
+)
+bedrock_client = boto3.client("bedrock-runtime", config=configRetry)
 
 def correct_exam():
     pass
-
-def retryBedrock(MODEL_ID, body, maxRetry, waitTime ):
-    try:
-        response = bedrock_client.invoke_model(
-            modelId=MODEL_ID,
-            body=body,
-        )
-        print(f'Bedrock: OK')
-        return response
-    except bedrock_client.exceptions.ThrottlingException as err:
-        for i in range(maxRetry):
-            print(f'Bedrock: Error, Try: {i+1}, Exception: {bedrock_client.exceptions}')
-            time.sleep(waitTime)
-            try:
-                response = bedrock_client.invoke_model(
-                    modelId=MODEL_ID,
-                    body=body,
-                )
-                print(f'Bedrock: OK')
-                return response
-            except:
-                print(f'Bedrock: Error after {i} try')
 
 def lambda_handler(event, context):
     # Get exam image
@@ -81,7 +67,10 @@ def lambda_handler(event, context):
         ]
     }
 
-    response = retryBedrock(MODEL_ID, json.dumps(request_body), 4, 30)
+    response = bedrock_client.invoke_model(
+            modelId=MODEL_ID,
+            body=json.dumps(request_body),
+        )
   
     # Generate Transcription
     print("Generate Transcription")
@@ -110,7 +99,10 @@ def lambda_handler(event, context):
         ]
     }
 
-    responsetranscribe = retryBedrock(MODEL_ID, json.dumps(request_body), 4, 30)
+    responsetranscribe = bedrock_client.invoke_model(
+            modelId=MODEL_ID,
+            body=json.dumps(request_body),
+        )
 
     result = json.loads(responsetranscribe.get("body").read())
     textTranscribe = str(result["content"]).replace("[{'type': 'text', 'text': '", "").replace("'}]","")    

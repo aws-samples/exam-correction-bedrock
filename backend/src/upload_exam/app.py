@@ -2,9 +2,15 @@ import os
 import json
 import random
 import boto3
+from botocore.config import Config
 
 BUCKET = os.environ["BUCKET_NAME"]
-s3 = boto3.client('s3')
+
+my_config = Config(
+    signature_version = 's3v4',
+    s3={'addressing_style': 'path'},
+)
+s3 = boto3.client('s3', config=my_config)
 
 def lambda_handler(event, context):
     body = json.loads(event['body'])
