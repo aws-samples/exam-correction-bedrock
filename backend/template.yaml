@@ -15,7 +15,7 @@ Globals:
 Parameters:
   PythonVersion:
     Type: String
-    Default: python3.12
+    Default: python3.9
     Description: Python version
 
 Resources:
